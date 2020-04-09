@@ -5,13 +5,13 @@
       <map />
     </option>
   </component>
-  <component name="NewModuleRootManager">
-    <output url="file://$MODULE_DIR$" />
-    <output-test url="file://$MODULE_DIR$" />
+  <component name="NewModuleRootManager" inherit-compiler-output="true">
     <content url="file://$MODULE_DIR$">
-      <sourceFolder url="file://$MODULE_DIR$" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/resources" type="java-resource" />
       <excludeFolder url="file://$MODULE_DIR$/.idea" />
       <excludeFolder url="file://$MODULE_DIR$/.lift" />
+      <excludeFolder url="file://$MODULE_DIR$/target" />
       <excludePattern pattern="*.iml" />
       <excludePattern pattern="*.class" />
     </content>

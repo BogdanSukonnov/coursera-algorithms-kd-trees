@@ -6,6 +6,7 @@
 
 import edu.princeton.cs.algs4.Point2D;
 import edu.princeton.cs.algs4.RectHV;
+import edu.princeton.cs.algs4.StdDraw;
 
 import java.util.TreeSet;
 
@@ -43,6 +44,8 @@ public class PointSET {
     // draw all points to standard draw
     public void draw() {
         for (Point2D point : pointSet) {
+            StdDraw.setPenColor(StdDraw.BLACK);
+            StdDraw.setPenRadius(0.01);
             point.draw();
         }
     }
@@ -65,7 +68,7 @@ public class PointSET {
         Point2D nearestPoint = null;
         double shortestDistance = Double.MAX_VALUE;
         for (Point2D candidatePoint : pointSet) {
-            double candidateDistance = point.distanceTo(candidatePoint);
+            double candidateDistance = point.distanceSquaredTo(candidatePoint);
             if (candidateDistance < shortestDistance) {
                 nearestPoint = candidatePoint;
                 shortestDistance = candidateDistance;
