@@ -14,10 +14,6 @@ public class KdTree {
     private Node root;
     private int size = 0;
 
-    // construct an empty set of points
-    public KdTree() {
-    }
-
     // is the set empty?
     public boolean isEmpty() {
         return root == null;
@@ -142,25 +138,33 @@ public class KdTree {
         if (rect.contains(candidate.getPoint())) {
             inStack.push(candidate.getPoint());
         }
+        boolean needLeftSearch = false;
+        boolean needRightSearch = false;
         if (rect.intersects(candidate.getRect())) {
-            findInRect(candidate.getRightTop(), !isVertical, inStack, rect);
-            findInRect(candidate.getLeftBottom(), !isVertical, inStack, rect);
+            needLeftSearch = true;
+            needRightSearch = true;
         }
         else if (isVertical) {
             if (rect.xmax() < candidate.getPoint().x()) {
-                findInRect(candidate.getLeftBottom(), !isVertical, inStack, rect);
+                needLeftSearch = true;
             }
             else {
-                findInRect(candidate.getRightTop(), !isVertical, inStack, rect);
+                needRightSearch = true;
             }
         }
         else {
             if (rect.ymax() < candidate.getPoint().y()) {
-                findInRect(candidate.getLeftBottom(), !isVertical, inStack, rect);
+                needLeftSearch = true;
             }
             else {
-                findInRect(candidate.getRightTop(), !isVertical, inStack, rect);
+                needRightSearch = true;
             }
+        }
+        if (needLeftSearch) {
+            findInRect(candidate.getLeftBottom(), !isVertical, inStack, rect);
+        }
+        if (needRightSearch) {
+            findInRect(candidate.getRightTop(), !isVertical, inStack, rect);
         }
     }
 
@@ -168,47 +172,52 @@ public class KdTree {
     public Point2D nearest(Point2D point) {
         if (point == null) throw new IllegalArgumentException();
         if (size() == 0) return null;
-        // boolean isVertical = true;
-        // while (true) {
-        //     if (isVertical) {
-        //         if (point.x() < candidate.getPoint().x()) {
-        //             candidate = candidate.getLeftBottom();
-        //         }
-        //         else {
-        //             candidate = candidate.getRightTop();
-        //         }
-        //     }
-        //     else {
-        //         if (point.y() < candidate.getPoint().y()) {
-        //             candidate = candidate.getLeftBottom();
-        //         }
-        //         else {
-        //             candidate = candidate.getRightTop();
-        //         }
-        //     }
-        //     if (candidate == null) break;
-        //     if (point.distanceSquaredTo(candidate.getPoint()) <
-        //             point.distanceSquaredTo(nearest.getPoint())) {
-        //         nearest = candidate;
-        //     }
-        //     isVertical = !isVertical;
-        //     break;
-        // }
         Point2D[] nearest = new Point2D[1];
         nearest[0] = root.getPoint();
-        return findNearest(root, true, nearest, point);
+        findNearest(root, true, new RectHV(0.0, 0.0, 1.0, 1.0), nearest, point);
+        return nearest[0];
     }
 
-    private Point2D findNearest(Node candidate, boolean isVertical, Point2D[] nearest,
-                                Point2D point) {
-        if (candidate == null) return nearest[0];
+    private void findNearest(Node candidate, boolean isVertical, RectHV outRect, Point2D[] nearest,
+                             Point2D point) {
+        if (candidate == null) return;
         if (candidate.getPoint().distanceSquaredTo(point) <
                 nearest[0].distanceSquaredTo(point)) {
             nearest[0] = candidate.getPoint();
         }
-        findNearest(candidate.getLeftBottom(), !isVertical, nearest, point);
-        findNearest(candidate.getRightTop(), !isVertical, nearest, point);
-        return nearest[0];
+        RectHV leftBottomRect = null;
+        RectHV rightTopRect = null;
+        if (isVertical) {
+            leftBottomRect = new RectHV(outRect.xmin(), outRect.ymin(), point.x(), outRect.ymax());
+            rightTopRect = new RectHV(point.x(), outRect.ymin(), outRect.xmax(), outRect.ymax());
+        }
+        else {
+            leftBottomRect = new RectHV(outRect.xmin(), outRect.ymin(), outRect.xmax(), point.y());
+            rightTopRect = new RectHV(outRect.xmin(), point.y(), outRect.xmax(), outRect.ymax());
+        }
+        if (point.distanceSquaredTo(closestPoint(leftBottomRect, point)) <
+                point.distanceSquaredTo(nearest[0])) {
+            findNearest(candidate.getLeftBottom(), !isVertical, leftBottomRect, nearest, point);
+        }
+        if (point.distanceSquaredTo(closestPoint(rightTopRect, point)) <
+                point.distanceSquaredTo(nearest[0])) {
+            findNearest(candidate.getRightTop(), !isVertical, rightTopRect, nearest, point);
+        }
+    }
+
+    private Point2D closestPoint(RectHV rect, Point2D point) {
+        if (rect == null || point == null || rect.contains(point)) return point;
+        return new Point2D(closestCoordinate(rect.xmin(), rect.xmax(), point.x()),
+                           closestCoordinate(rect.ymin(), rect.ymax(), point.y()));
+    }
+
+    private double closestCoordinate(double rectMin, double rectMax, double pointCoordinate) {
+        // point between min and max - closest is point
+        if (rectMin <= pointCoordinate && rectMax >= pointCoordinate) return pointCoordinate;
+        // point is more that rect, return max of rect
+        if (rectMin <= pointCoordinate) return Math.max(rectMin, rectMax);
+        // point is less than rect, return min of rect
+        return Math.min(rectMin, rectMax);
     }
 
     // unit testing of the methods (optional)

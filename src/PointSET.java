@@ -66,7 +66,7 @@ public class PointSET {
     public Point2D nearest(Point2D point) {
         if (point == null) throw new IllegalArgumentException();
         Point2D nearestPoint = null;
-        double shortestDistance = Double.MAX_VALUE;
+        double shortestDistance = Double.POSITIVE_INFINITY;
         for (Point2D candidatePoint : pointSet) {
             double candidateDistance = point.distanceSquaredTo(candidatePoint);
             if (candidateDistance < shortestDistance) {
