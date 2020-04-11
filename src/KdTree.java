@@ -4,6 +4,7 @@
  *  Description:
  **************************************************************************** */
 
+import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.Point2D;
 import edu.princeton.cs.algs4.RectHV;
 import edu.princeton.cs.algs4.Stack;
@@ -190,13 +191,19 @@ public class KdTree {
         RectHV leftBottomRect = null;
         RectHV rightTopRect = null;
         if (isVertical) {
-            leftBottomRect = new RectHV(outRect.xmin(), outRect.ymin(), point.x(), outRect.ymax());
-            rightTopRect = new RectHV(point.x(), outRect.ymin(), outRect.xmax(), outRect.ymax());
+            leftBottomRect = new RectHV(outRect.xmin(), outRect.ymin(), candidate.getPoint().x(),
+                                        outRect.ymax());
+            rightTopRect = new RectHV(candidate.getPoint().x(), outRect.ymin(), outRect.xmax(),
+                                      outRect.ymax());
         }
         else {
-            leftBottomRect = new RectHV(outRect.xmin(), outRect.ymin(), outRect.xmax(), point.y());
-            rightTopRect = new RectHV(outRect.xmin(), point.y(), outRect.xmax(), outRect.ymax());
+            leftBottomRect = new RectHV(outRect.xmin(), outRect.ymin(), outRect.xmax(),
+                                        candidate.getPoint().y());
+            rightTopRect = new RectHV(outRect.xmin(), candidate.getPoint().y(), outRect.xmax(),
+                                      outRect.ymax());
         }
+        // StdOut.printf("point: %s; vertical: %s; leftBottom: %s; rightTop: %s\n",
+        //               candidate.getPoint(), isVertical, leftBottomRect, rightTopRect);
         if (point.distanceSquaredTo(closestPoint(leftBottomRect, point)) <
                 point.distanceSquaredTo(nearest[0])) {
             findNearest(candidate.getLeftBottom(), !isVertical, leftBottomRect, nearest, point);
@@ -224,7 +231,17 @@ public class KdTree {
 
     // unit testing of the methods (optional)
     public static void main(String[] args) {
-        // no tests
+        // initialize the two data structures with point from file
+        String filename = args[0];
+        In in = new In(filename);
+        KdTree kdtree = new KdTree();
+        while (!in.isEmpty()) {
+            double x = in.readDouble();
+            double y = in.readDouble();
+            Point2D p = new Point2D(x, y);
+            kdtree.insert(p);
+        }
+        kdtree.nearest(new Point2D(0.001, 0.001));
     }
 
     private static class Node {
@@ -277,7 +294,7 @@ public class KdTree {
         node.getPoint().draw();
 
         StdDraw.setPenColor(isVertical ? StdDraw.RED : StdDraw.BLUE);
-        // StdDraw.setPenRadius(0.002);
+        StdDraw.setPenRadius(0.002);
         node.getRect().draw();
 
         drawNode(node.getRightTop(), !isVertical);
