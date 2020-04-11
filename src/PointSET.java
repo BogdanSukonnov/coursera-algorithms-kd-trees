@@ -12,7 +12,7 @@ import java.util.TreeSet;
 
 public class PointSET {
 
-    private TreeSet<Point2D> pointSet;
+    private final TreeSet<Point2D> pointSet;
 
     // construct an empty set of points
     public PointSET() {
@@ -45,7 +45,7 @@ public class PointSET {
     public void draw() {
         for (Point2D point : pointSet) {
             StdDraw.setPenColor(StdDraw.BLACK);
-            StdDraw.setPenRadius(0.01);
+            // StdDraw.setPenRadius(0.01);
             point.draw();
         }
     }
@@ -79,5 +79,6 @@ public class PointSET {
 
     // unit testing of the methods (optional)
     public static void main(String[] args) {
+        // no tests
     }
 }

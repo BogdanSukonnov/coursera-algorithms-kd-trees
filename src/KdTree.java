@@ -47,6 +47,7 @@ public class KdTree {
                     maxY = parent.getPoint().y();
                 }
                 else {
+                    if (point.equals(parent.getPoint())) return;
                     nextParent = parent.getRightTop();
                     goLeft = false;
                     minY = parent.getPoint().y();
@@ -58,6 +59,7 @@ public class KdTree {
                     maxX = parent.getPoint().x();
                 }
                 else {
+                    if (point.equals(parent.getPoint())) return;
                     nextParent = parent.getRightTop();
                     goLeft = false;
                     minX = parent.getPoint().x();
@@ -222,13 +224,14 @@ public class KdTree {
 
     // unit testing of the methods (optional)
     public static void main(String[] args) {
+        // no tests
     }
 
     private static class Node {
         // the point
-        private Point2D point;
+        private final Point2D point;
         // the axis-aligned rectangle corresponding to this node
-        private RectHV rect;
+        private final RectHV rect;
         // the left/bottom subtree
         private Node leftBottom;
         // the right/top subtree
@@ -274,56 +277,9 @@ public class KdTree {
         node.getPoint().draw();
 
         StdDraw.setPenColor(isVertical ? StdDraw.RED : StdDraw.BLUE);
-        StdDraw.setPenRadius(0.002);
+        // StdDraw.setPenRadius(0.002);
         node.getRect().draw();
 
         drawNode(node.getRightTop(), !isVertical);
-    }
-
-    private enum Direction {
-        DOWN_LEFT, UP_RIGHT, DOWN_RIGHT, UP_LEFT
-    }
-
-    // cicle draw
-    private void cicleDraw() {
-        Direction direction = Direction.DOWN_LEFT;
-        Node node = root;
-        Stack<Node> stack = new Stack<>();
-        while (true) {
-            if (node == null && stack.isEmpty()) return;
-            if (direction == Direction.DOWN_LEFT) {
-                if (node == null) {
-                    direction = Direction.UP_RIGHT;
-                    node = stack.peek();
-                    continue;
-                }
-                else {
-                    stack.push(node);
-                    node = node.getLeftBottom();
-                }
-            }
-            if (direction == Direction.UP_RIGHT) {
-                assert node != null;
-                node.getPoint().draw();
-                node = node.getRightTop();
-                direction = Direction.DOWN_RIGHT;
-            }
-            if (direction == Direction.DOWN_RIGHT) {
-                if (node == null) {
-                    direction = Direction.UP_LEFT;
-                    node = stack.pop();
-                }
-                else {
-                    stack.push(node);
-                    node = node.getLeftBottom();
-                    direction = Direction.DOWN_LEFT;
-                }
-            }
-            if (node == null) {
-                node = stack.pop();
-                node.getPoint().draw();
-                node = node.getRightTop();
-            }
-        }
     }
 }
